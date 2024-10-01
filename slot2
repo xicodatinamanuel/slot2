@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeca Slot Machine</title>
+</head>
+<body>
+    <h1>Zeca Slot Machine</h1>
+    <p>Saldo Atual: <span id="balance">50</span> €</p>
+    
+    <label for="bet">Coloca a tua aposta: </label>
+    <input type="number" id="bet" min="1">
+    <button id="spinButton">Girar!</button>
+
+    <p>Resultado: <span id="result">---</span></p>
+    <p id="message"></p>
+    
+    <script>
+        let balance = 50;
+        const symbols = ['🏢', '🐔', '🧬', '❤️'];
+
+        function spinRow() {
+            let result = [];
+            for (let i = 0; i < 3; i++) {
+                result.push(symbols[Math.floor(Math.random() * symbols.length)]);
+            }
+            return result;
+        }
+
+        function printRow(row) {
+            return row.join(' | ');
+        }
+
+        function getPayout(row, bet) {
+            if (row[0] === row[1] && row[1] === row[2]) {
+                if (row[0] === '🏢') {
+                    return bet * 10;
+                } else if (row[0] === '🐔') {
+                    return bet * 5;
+                } else if (row[0] === '🧬') {
+                    return bet * 3;
+                } else if (row[0] === '❤️') {
+                    return bet * 2;
+                }
+            }
+            return 0;
+        }
+
+        document.getElementById("spinButton").addEventListener("click", function() {
+            const betInput = document.getElementById("bet");
+            let bet = parseInt(betInput.value);
+
+            if (isNaN(bet) || bet <= 0) {
+                document.getElementById("message").innerText = "Coloca uma aposta válida";
+                return;
+            }
+
+            if (bet > balance) {
+                document.getElementById("message").innerText = "Sem massa para apostar";
+                return;
+            }
+
+            balance -= bet;
+            document.getElementById("balance").innerText = balance;
+
+            let row = spinRow();
+            document.getElementById("result").innerText = printRow(row);
+
+            let payout = getPayout(row, bet);
+            if (payout > 0) {
+                document.getElementById("message").innerText = `Puxa manel, ganhaste €${payout}!`;
+            } else {
+                document.getElementById("message").innerText = "Tenta outra vez!";
+            }
+
+            balance += payout;
+            document.getElementById("balance").innerText = balance;
+
+            if (balance <= 0) {
+                document.getElementById("message").innerText = "Acabou a Festa. O teu saldo é 0.";
+            }
+        });
+    </script>
+</body>
+</html>
